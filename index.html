@@ -364,7 +364,7 @@
 
 <div class="main-wrapper">
     <div class="card">
-        <div class="section-title">सवारी साधन कर, नवीकरण तथा आयकर गणना (One-Time Fiscal Year Calculation Rule)</div>
+        <div class="section-title">सवारी साधन कर, नवीकरण तथा आयकर गणना (परिमार्जित मोटरसाइकल नवीकरण नियम)</div>
         
         <div class="form-grid">
             <div class="form-group full-width">
@@ -432,7 +432,7 @@
         </div>
 
         <button onclick="calculateTax()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line><line x1="12" y1="9" x2="12" y2="17"></line></svg>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line><line x1="12" y1="9" x2="12" height="8" y2="17"></line></svg>
             कर तथा जरिवाना हिसाब गर्नुहोस्
         </button>
     </div>
@@ -452,7 +452,7 @@
                         <th>आर्थिक वर्ष</th>
                         <th class="text-right">वार्षिक मूल कर</th>
                         <th class="text-right">कर जरिवाना</th>
-                        <th class="text-right">नवीकरण दस्तुर</th>
+                        <th class="text-right">नवीकरण दस्तुर र जरिवाना</th>
                         <th class="text-right">आयकर (भाडा)</th>
                         <th class="text-right">जम्मा</th>
                     </tr>
@@ -665,7 +665,7 @@
 
         const annualTax = getTaxRateFromDocument(category);
         const baseIncomeTax = getBaseIncomeTaxRate(category);
-        const BASE_RENEWAL = getRenewalRateFromDocument(category); 
+        const BASE_RENEWAL = getRenewalRateFromDocument(category);
 
         const [expYear, expMonth, expDay] = expiry.split('-').map(Number);
         const [payYear, payMonth, payDay] = payment.split('-').map(Number);
@@ -673,7 +673,6 @@
         const initialExpiredFY = getFYStartYear(expYear, expMonth);
         const currentPaymentFY = getFYStartYear(payYear, payMonth);
 
-        // क्रिटिकल कन्डिसन: यदि म्याद सकिने आर्थिक वर्ष र हालको वर्ष एउटै हो र म्याद बाँकी नै छ (Already Paid) भने हिसाब नगर्ने
         if (initialExpiredFY === currentPaymentFY && (expYear > payYear || (expYear === payYear && expMonth > payMonth) || (expYear === payYear && expMonth === payMonth && expDay >= payDay))) {
             const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #16a34a; font-weight: 600; padding: 20px;">यस आर्थिक वर्षको कर पहिले नै चुक्ता भइसकेको छ। थप शुल्क लाग्ने छैन।</td></tr>';
@@ -692,22 +691,34 @@
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = ''; 
 
-        // लुपले बक्यौता आर्थिक वर्षदेखि चालु आर्थिक वर्षसम्म मात्र गणना गर्छ
+        const isBike = (category === 'p_bike_fuel' || category === 'p_bike_electric');
+
         for (let fy = initialExpiredFY; fy <= currentPaymentFY; fy++) {
             let fyLabel = `${fy}/${(fy + 1) % 100}`;
             let taxFinePercentage = 0;
             let currentYearRenewal = BASE_RENEWAL;
+            let isSpecialBikeFineApplied = false;
+            let isBike3MonthFineApplied = false;
 
             if (fy < currentPaymentFY) {
+                // बक्यौता वर्षहरूका लागि जरिवाना दरहरू
                 let yearsLate = (currentPaymentFY - fy);
                 if (yearsLate === 1) taxFinePercentage = 0.40;
                 else if (yearsLate === 2) taxFinePercentage = 0.60;
                 else if (yearsLate === 3) taxFinePercentage = 0.80;
                 else taxFinePercentage = 1.00;
-                
-                currentYearRenewal = BASE_RENEWAL * 2; 
+
+                if (isBike) {
+                    // मोटरसाइकल/स्कुटरको विशेष बक्यौता नियम: ३०० दस्तुर + ३०० जरिवाना + १०० अतिरिक्त जरिवाना = ७००
+                    currentYearRenewal = 300 + 300 + 100;
+                    isSpecialBikeFineApplied = true;
+                } else {
+                    // अन्य सवारी साधनको लागि साविक बमोजिम नवीकरण दस्तुर दोब्बर लाग्ने
+                    currentYearRenewal = BASE_RENEWAL * 2;
+                }
             } 
             else {
+                // चालु आर्थिक वर्षका लागि नियमहरू
                 if (payMonth === 4 || payMonth === 5 || payMonth === 6) { 
                     taxFinePercentage = 0.00;
                 } else if (payMonth === 7 || payMonth === 8 || payMonth === 9) { 
@@ -718,13 +729,16 @@
                     taxFinePercentage = 0.20;
                 }
 
-                if (category === 'p_bike_fuel' || category === 'p_bike_electric') {
-                    if (daysPassed <= 90) {
-                        currentYearRenewal = 300; 
+                if (isBike) {
+                    // मोटरसाइकल/स्कुटरको लागि ३ महिना काटेमा १००% जरिवाना (३०० + ३०० = ६००)
+                    if (daysPassed > 90) {
+                        currentYearRenewal = 300 + 300;
+                        isBike3MonthFineApplied = true;
                     } else {
-                        currentYearRenewal = 600; 
+                        currentYearRenewal = 300;
                     }
                 } else {
+                    // अन्य सवारी साधनहरूको लागि पुरानै चालु आर्थिक वर्षको नियम (म्याद नाघेको खण्डमा दोब्बर)
                     if (payMonth > 6 || payMonth <= 3) { 
                         currentYearRenewal = BASE_RENEWAL * 2;
                     }
@@ -750,12 +764,21 @@
             const row = document.createElement('tr');
             let fineBadge = fyTaxFine > 0 ? ` <span class="badge">${(taxFinePercentage * 100).toFixed(0)}%</span>` : '';
             let incomeTaxDetails = additionalFineIncomeTax > 0 ? `<br><span class="badge-income">२५% जरिवाना थप: Rs. ${additionalFineIncomeTax.toLocaleString()}</span>` : '';
+            
+            let renewalLabel = `Rs. ${currentYearRenewal.toLocaleString()}`;
+            if (isSpecialBikeFineApplied) {
+                renewalLabel += ` <span class="badge">(नवीकरण+१००% जरिवाना+१०० थप)</span>`;
+            } else if (isBike3MonthFineApplied) {
+                renewalLabel += ` <span class="badge">(३ महिना नाघेको १००%)</span>`;
+            } else if (fy < currentPaymentFY && !isBike) {
+                renewalLabel += ` <span class="badge">(म्याद नाघेको दस्तुर दोब्बर)</span>`;
+            }
 
             row.innerHTML = `
                 <td><strong>${fyLabel}</strong></td>
                 <td class="text-right">Rs. ${fyTax.toLocaleString()}</td>
                 <td class="text-right">Rs. ${fyTaxFine.toLocaleString()}${fineBadge}</td>
-                <td class="text-right">Rs. ${currentYearRenewal.toLocaleString()}</td>
+                <td class="text-right">${renewalLabel}</td>
                 <td class="text-right">Rs. ${currentYearIncomeTax.toLocaleString()}${incomeTaxDetails}</td>
                 <td class="text-right"><strong>Rs. ${rowTotal.toLocaleString()}</strong></td>
             `;
