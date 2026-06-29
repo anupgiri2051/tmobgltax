@@ -701,7 +701,6 @@
             let isBike3MonthFineApplied = false;
 
             if (fy < currentPaymentFY) {
-                // बक्यौता वर्षहरूका लागि जरिवाना दरहरू
                 let yearsLate = (currentPaymentFY - fy);
                 if (yearsLate === 1) taxFinePercentage = 0.40;
                 else if (yearsLate === 2) taxFinePercentage = 0.60;
@@ -709,16 +708,14 @@
                 else taxFinePercentage = 1.00;
 
                 if (isBike) {
-                    // मोटरसाइकल/स्कुटरको विशेष बक्यौता नियम: ३०० दस्तुर + ३०० जरिवाना + १०० अतिरिक्त जरिवाना = ७००
-                    currentYearRenewal = 300 + 300 + 100;
+                    // नयाँ नियम: नवीकरण ३०० + १००% जरिवाना ३०० + थप नवीकरण ३०० = ९००
+                    currentYearRenewal = 300 + 300 + 300;
                     isSpecialBikeFineApplied = true;
                 } else {
-                    // अन्य सवारी साधनको लागि साविक बमोजिम नवीकरण दस्तुर दोब्बर लाग्ने
                     currentYearRenewal = BASE_RENEWAL * 2;
                 }
             } 
             else {
-                // चालु आर्थिक वर्षका लागि नियमहरू
                 if (payMonth === 4 || payMonth === 5 || payMonth === 6) { 
                     taxFinePercentage = 0.00;
                 } else if (payMonth === 7 || payMonth === 8 || payMonth === 9) { 
@@ -730,7 +727,6 @@
                 }
 
                 if (isBike) {
-                    // मोटरसाइकल/स्कुटरको लागि ३ महिना काटेमा १००% जरिवाना (३०० + ३०० = ६००)
                     if (daysPassed > 90) {
                         currentYearRenewal = 300 + 300;
                         isBike3MonthFineApplied = true;
@@ -738,7 +734,6 @@
                         currentYearRenewal = 300;
                     }
                 } else {
-                    // अन्य सवारी साधनहरूको लागि पुरानै चालु आर्थिक वर्षको नियम (म्याद नाघेको खण्डमा दोब्बर)
                     if (payMonth > 6 || payMonth <= 3) { 
                         currentYearRenewal = BASE_RENEWAL * 2;
                     }
@@ -767,7 +762,7 @@
             
             let renewalLabel = `Rs. ${currentYearRenewal.toLocaleString()}`;
             if (isSpecialBikeFineApplied) {
-                renewalLabel += ` <span class="badge">(नवीकरण+१००% जरिवाना+१०० थप)</span>`;
+                renewalLabel += ` <span class="badge">(नवीकरण + १००% जरिवाना + ३०० थप)</span>`;
             } else if (isBike3MonthFineApplied) {
                 renewalLabel += ` <span class="badge">(३ महिना नाघेको १००%)</span>`;
             } else if (fy < currentPaymentFY && !isBike) {
