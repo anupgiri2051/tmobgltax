@@ -1,0 +1,773 @@
+<!DOCTYPE html>
+<html lang="ne">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>सवारी साधन कर क्यालकुलेटर - यातायात व्यवस्था कार्यालय, बागलुङ</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #0284c7; /* Sky Blue Primary */
+            --primary-dark: #0369a1;
+            --primary-light: #e0f2fe;
+            --secondary: #e11d48;
+            --bg-body: #f0f9ff; 
+            --card-bg: #ffffff;
+            --text-title: #0f172a;
+            --text-body: #334155;
+            --border: #bae6fd;
+            --shadow: 0 10px 30px -5px rgba(2, 132, 199, 0.1), 0 8px 15px -6px rgba(2, 132, 199, 0.05);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: 'Poppins', 'Segoe UI', system-ui, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-body);
+            color: var(--text-body);
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-bottom: 50px;
+        }
+
+        .top-stripe {
+            width: 100%;
+            height: 6px;
+            background: linear-gradient(to right, var(--primary), #38bdf8);
+        }
+
+        .header {
+            width: 100%;
+            max-width: 950px;
+            background: var(--card-bg);
+            padding: 30px 24px;
+            text-align: center;
+            border-radius: 0 0 24px 24px;
+            box-shadow: var(--shadow);
+            margin-bottom: 30px;
+            border: 1px solid rgba(255, 255, 255, 0.8);
+        }
+
+        .gov-logo {
+            width: 85px;
+            height: auto;
+            margin: 0 auto 12px auto;
+            display: block;
+        }
+
+        .header h1 {
+            font-size: 22px;
+            color: #1e3a8a;
+            font-weight: 700;
+            margin-bottom: 4px;
+        }
+
+        .header h2 {
+            font-size: 16px;
+            color: var(--primary-dark);
+            font-weight: 600;
+        }
+
+        .main-wrapper {
+            max-width: 950px;
+            width: 92%;
+            display: flex;
+            flex-direction: column;
+            gap: 25px;
+        }
+
+        .card {
+            background: var(--card-bg);
+            padding: 35px 30px;
+            border-radius: 20px;
+            box-shadow: var(--shadow);
+            border: 1px solid rgba(255, 255, 255, 0.7);
+        }
+
+        .section-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: #1e3a8a;
+            margin-bottom: 24px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .section-title::before {
+            content: '';
+            display: inline-block;
+            width: 5px;
+            height: 22px;
+            background-color: var(--primary);
+            border-radius: 4px;
+        }
+
+        .form-grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
+        }
+
+        @media (min-width: 600px) {
+            .form-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+            .full-width {
+                grid-column: span 2;
+            }
+        }
+
+        .form-group {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        label {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-title);
+        }
+
+        input, select {
+            width: 100%;
+            padding: 14px 16px;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-size: 15px;
+            color: var(--text-title);
+            background-color: #f8fafc;
+            transition: all 0.25s ease;
+        }
+
+        input:focus, select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background-color: #fff;
+            box-shadow: 0 0 0 4px rgba(2, 132, 199, 0.15);
+        }
+
+        button {
+            width: 100%;
+            background: linear-gradient(135deg, var(--primary), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 16px 20px;
+            font-size: 16px;
+            font-weight: 600;
+            border-radius: 12px;
+            cursor: pointer;
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.2);
+            transition: all 0.2s ease;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 8px;
+        }
+
+        button:hover {
+            background: linear-gradient(135deg, var(--primary-dark), #02507d);
+            transform: translateY(-1px);
+        }
+
+        .btn-print {
+            background: linear-gradient(135deg, #10b981, #059669);
+            margin-top: 20px;
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+        }
+
+        .btn-print:hover {
+            background: linear-gradient(135deg, #059669, #047857);
+        }
+
+        .result-box {
+            display: none;
+            animation: fadeIn 0.4s ease-out forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .invoice-meta-info {
+            background-color: var(--primary-light);
+            border-radius: 10px;
+            padding: 14px 18px;
+            margin-bottom: 20px;
+            font-size: 14px;
+            color: #0369a1;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .table-responsive {
+            width: 100%;
+            overflow-x: auto;
+            margin-bottom: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--border);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+            font-size: 14px;
+        }
+
+        th {
+            background-color: var(--primary-light);
+            color: #0369a1;
+            font-weight: 600;
+            padding: 14px 16px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        td {
+            padding: 14px 16px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .badge {
+            background-color: #fee2e2;
+            color: var(--secondary);
+            padding: 2px 8px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+        
+        .badge-income {
+            background-color: #fef3c7;
+            color: #d97706;
+            padding: 2px 6px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 500;
+            display: inline-block;
+            margin-top: 2px;
+        }
+
+        .invoice-total-block {
+            background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+            border: 1px solid #bbf7d0;
+            border-radius: 14px;
+            padding: 22px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .total-label {
+            font-size: 16px;
+            font-weight: 700;
+            color: #166534;
+        }
+
+        .total-amount {
+            font-size: 24px;
+            font-weight: 800;
+            color: #15803d;
+        }
+
+        .footer {
+            text-align: center;
+            font-size: 13px;
+            color: #64748b;
+            margin-top: 40px;
+            width: 100%;
+            line-height: 1.6;
+        }
+
+        .creator-tag {
+            font-weight: 600;
+            color: var(--primary-dark);
+            margin-top: 5px;
+        }
+
+        @media print {
+            body {
+                background-color: #ffffff;
+                padding: 0;
+            }
+            .top-stripe, .card:not(.result-box), button, .footer {
+                display: none !important;
+            }
+            .header {
+                box-shadow: none;
+                border-bottom: 2px solid #000;
+                border-radius: 0;
+                margin-bottom: 20px;
+                padding: 10px 0;
+            }
+            .main-wrapper {
+                width: 100%;
+                max-width: 100%;
+            }
+            .result-box {
+                display: block !important;
+                box-shadow: none;
+                border: none;
+                padding: 0;
+            }
+            .invoice-meta-info {
+                background-color: #f1f5f9 !important;
+                color: #000 !important;
+                border: 1px solid #cbd5e1;
+            }
+            th {
+                background-color: #f1f5f9 !important;
+                color: #000 !important;
+                border-bottom: 2px solid #000 !important;
+            }
+            td, th {
+                border-bottom: 1px solid #cbd5e1 !important;
+            }
+            .invoice-total-block {
+                background: #f8fafc !important;
+                border: 1px solid #000 !important;
+                color: #000 !important;
+            }
+            .total-label, .total-amount {
+                color: #000 !important;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<div class="top-stripe"></div>
+
+<div class="header">
+    <img src="https://upload.wikimedia.org/wikipedia/commons/2/23/Emblem_of_Nepal.svg" alt="नेपाल सरकार" class="gov-logo">
+    <h1>भौतिक पूर्वाधार विकास तथा यातायात व्यवस्था मन्त्रालय</h1>
+    <h2>यातायात व्यवस्था कार्यालय, बागलुङ (गण्डकी प्रदेश)</h2>
+</div>
+
+<div class="main-wrapper">
+    <div class="card">
+        <div class="section-title">सवारी साधन कर, नवीकरण तथा आयकर गणना (One-Time Fiscal Year Calculation Rule)</div>
+        
+        <div class="form-grid">
+            <div class="form-group full-width">
+                <label for="vehicleNumber">सवारी साधनको नम्बर (Vehicle Number)</label>
+                <input type="text" id="vehicleNumber" placeholder="उदाहरण: ध १ प ७८९० वा ध १ च १२३४">
+            </div>
+
+            <div class="form-group full-width">
+                <label for="vehicleCategory">सवारी साधनको वर्ग छनोट गर्नुहोस्</label>
+                <select id="vehicleCategory" onchange="handleCategoryChange()">
+                    <optgroup label="१. निजी सवारी साधन (Private Vehicles)">
+                        <option value="p_bike_fuel" selected>मोटर साइकल तथा स्कुटर (इन्धन / CC आधारित)</option>
+                        <option value="p_car_jeep">कार, जीप, भ्यान, माइक्रो बस (CC आधारित)</option>
+                        <option value="p_machinery_heavy">डोजर, एक्साभेटर, लोडर, रोलर, क्रेन जस्ता मेशिनरी</option>
+                        <option value="p_tipper_container">ट्रिपर / कन्टेनर ट्रक</option>
+                        <option value="p_minitipper">मिनीट्रिपर</option>
+                        <option value="p_three_wheeler">अटो रिक्सा, THREE WHEELER र टेम्पो</option>
+                        <option value="p_tractor">ट्र्याक्टर</option>
+                        <option value="p_power_tiller">पावर टिलर</option>
+                        <option value="p_minitruck_bus">मिनीट्रक / मिनीबस</option>
+                        <option value="p_truck_bus">ट्रक र बस</option>
+                        <option value="p_oil_gas">तेल ट्यांकर, ग्याँस बुलेट</option>
+                        <option value="p_bike_electric">विद्युतीय मोटरसाइकल / स्कुटर (Watt आधारित)</option>
+                        <option value="p_car_electric">विद्युतीय कार, जीप, भ्यान, माइक्रोबस, बस (kW आधारित)</option>
+                    </optgroup>
+                    <optgroup label="२. भाडामा दर्ता भएका सवारी साधन (Commercial Vehicles)">
+                        <option value="r_car_jeep">कार, जिप, भ्यान, माइक्रो बस (CC आधारित)</option>
+                        <option value="r_heavy_machinery">डोजर, एक्साभेटर, लोडर, क्रेन (मेशिनरी उपकरण)</option>
+                        <option value="r_minitipper">मिनी ट्रिपर</option>
+                        <option value="r_three_wheeler">अटो रिक्सा, थ्री ह्वीलर र टेम्पो</option>
+                        <option value="r_tractor">ट्र्याक्टर</option>
+                        <option value="r_power_tiller">पावर टिलर</option>
+                        <option value="r_minitruck_bus">मिनीट्रक, मिनीबस, पानी ट्याङ्कर</option>
+                        <option value="r_truck_bus">ट्रक र बस</option>
+                        <option value="r_oil_gas_container">तेल ट्याङ्कर, ग्याँस बुलेट, ट्रिपर</option>
+                        <option value="r_car_electric">विद्युतीय सवारी साधन (kW आधारित)</option>
+                    </optgroup>
+                </select>
+            </div>
+
+            <div class="form-group full-width" id="ccGroup">
+                <label for="ccInput">इन्जिन क्षमता - CC (Engine Capacity)</label>
+                <input type="number" id="ccInput" placeholder="उदाहरण: 150" value="150">
+            </div>
+
+            <div class="form-group full-width" id="wattGroup" style="display: none;">
+                <label for="wattInput">मोटर क्षमता - वाट (Motor Capacity in Watt)</label>
+                <input type="number" id="wattInput" placeholder="उदाहरण: 1200" value="1200">
+            </div>
+
+            <div class="form-group full-width" id="kwGroup" style="display: none;">
+                <label for="kwInput">मोटर क्षमता - किलोवाट (Motor Capacity in kW)</label>
+                <input type="number" id="kwInput" placeholder="उदाहरण: 60" value="60">
+            </div>
+
+            <div class="form-group">
+                <label for="expiryInput">ब्लूबुक नवीकरण म्याद सकिएको मिति (BS)</label>
+                <input type="text" id="expiryInput" placeholder="YYYY-MM-DD" value="2081-04-01">
+            </div>
+
+            <div class="form-group">
+                <label for="paymentInput">कर बुझाउने आजको मिति (BS)</label>
+                <input type="text" id="paymentInput" placeholder="YYYY-MM-DD">
+            </div>
+        </div>
+
+        <button onclick="calculateTax()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line><line x1="12" y1="9" x2="12" y2="17"></line></svg>
+            कर तथा जरिवाना हिसाब गर्नुहोस्
+        </button>
+    </div>
+
+    <div id="resultBox" class="card result-box">
+        <div class="section-title">राजस्व गणना विवरण (Estimated Tax Bill)</div>
+        
+        <div class="invoice-meta-info">
+            <span id="metaVehicleNum">सवारी साधन नं: -</span>
+            <span id="metaDateInfo">मिति: -</span>
+        </div>
+        
+        <div class="table-responsive">
+            <table>
+                <thead>
+                    <tr>
+                        <th>आर्थिक वर्ष</th>
+                        <th class="text-right">वार्षिक मूल कर</th>
+                        <th class="text-right">कर जरिवाना</th>
+                        <th class="text-right">नवीकरण दस्तुर</th>
+                        <th class="text-right">आयकर (भाडा)</th>
+                        <th class="text-right">जम्मा</th>
+                    </tr>
+                </thead>
+                <tbody id="tableBody"></tbody>
+            </table>
+        </div>
+        
+        <div class="invoice-total-block">
+            <div class="total-label">कुल बुझाउनुपर्ने रकम (Grand Total):</div>
+            <div id="grandTotalText" class="total-amount">Rs. 0/-</div>
+        </div>
+
+        <button class="btn-print" onclick="window.print()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
+            प्रिन्ट गर्नुहोस् (Print Invoice)
+        </button>
+    </div>
+</div>
+
+<div class="footer">
+    <p>© २०८३ यातायात व्यवस्था कार्यालय, बागलुङ | गण्डकी प्रदेश</p>
+    <p class="creator-tag">Created by Anup Giri</p>
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        document.getElementById('paymentInput').value = "2083-03-15";
+    });
+
+    function handleCategoryChange() {
+        const category = document.getElementById('vehicleCategory').value;
+        
+        document.getElementById('ccGroup').style.display = 'none';
+        document.getElementById('wattGroup').style.display = 'none';
+        document.getElementById('kwGroup').style.display = 'none';
+
+        if (category === 'p_bike_fuel' || category === 'p_car_jeep' || category === 'r_car_jeep') {
+            document.getElementById('ccGroup').style.display = 'flex';
+        } else if (category === 'p_bike_electric') {
+            document.getElementById('wattGroup').style.display = 'flex';
+        } else if (category === 'p_car_electric' || category === 'r_car_electric') {
+            document.getElementById('kwGroup').style.display = 'flex';
+        }
+    }
+
+    function getTaxRateFromDocument(category) {
+        if (category === 'p_bike_fuel') {
+            const cc = parseInt(document.getElementById('ccInput').value) || 0;
+            if (cc <= 125) return 3000;
+            if (cc <= 150) return 5000;
+            if (cc <= 225) return 6500;
+            if (cc <= 400) return 11000;
+            if (cc <= 650) return 20000;
+            return 30000;
+        }
+        
+        if (category === 'p_car_jeep') {
+            const cc = parseInt(document.getElementById('ccInput').value) || 0;
+            if (cc <= 1000) return 22000;
+            if (cc <= 1500) return 25000;
+            if (cc <= 2000) return 27000;
+            if (cc <= 2500) return 37000;
+            if (cc <= 3000) return 50000;
+            if (cc <= 3500) return 60000;
+            return 65000;
+        }
+
+        if (category === 'p_bike_electric') {
+            const watt = parseInt(document.getElementById('wattInput').value) || 0;
+            if (watt <= 50) return 1000;
+            if (watt <= 350) return 1500;
+            if (watt <= 1000) return 2000;
+            if (watt <= 1500) return 2500;
+            return 3000;
+        }
+
+        if (category === 'p_car_electric') {
+            const kw = parseInt(document.getElementById('kwInput').value) || 0;
+            if (kw <= 50) return 12000;
+            if (kw <= 100) return 17000;
+            if (kw <= 150) return 22000;
+            if (kw <= 200) return 27000;
+            return 32000;
+        }
+
+        if (category === 'r_car_jeep') {
+            const cc = parseInt(document.getElementById('ccInput').value) || 0;
+            if (cc <= 1000) return 11000;
+            if (cc <= 1500) return 12500;
+            if (cc <= 2000) return 13500;
+            if (cc <= 2500) return 14500;
+            if (cc <= 3000) return 16500;
+            if (cc <= 3500) return 17500;
+            if (cc <= 4000) return 19000;
+            return 22000;
+        }
+
+        if (category === 'r_car_electric') {
+            const kw = parseInt(document.getElementById('kwInput').value) || 0;
+            if (kw <= 50) return 10000;
+            if (kw <= 100) return 15000;
+            if (kw <= 150) return 20000;
+            if (kw <= 200) return 25000;
+            return 30000;
+        }
+
+        const documentFixedRates = {
+            'p_machinery_heavy': 40000,
+            'p_tipper_container': 42000,
+            'p_minitipper': 30000,
+            'p_three_wheeler': 6000,
+            'p_tractor': 11000,
+            'p_power_tiller': 4500,
+            'p_minitruck_bus': 27000,
+            'p_truck_bus': 35000,
+            'p_oil_gas': 35000,
+            'r_heavy_machinery': 22000,
+            'r_minitipper': 21000,
+            'r_three_wheeler': 6000,
+            'r_tractor': 8000,
+            'r_power_tiller': 4500,
+            'r_minitruck_bus': 15000,
+            'r_truck_bus': 20000,
+            'r_oil_gas_container': 22000
+        };
+
+        return documentFixedRates[category] || 0;
+    }
+
+    function getBaseIncomeTaxRate(category) {
+        if (!category.startsWith('r_')) return 0; 
+
+        if (category === 'r_car_jeep') {
+            const cc = parseInt(document.getElementById('ccInput').value) || 0;
+            if (cc <= 1300) return 5500;
+            if (cc <= 2000) return 6000;
+            if (cc <= 2900) return 6500;
+            if (cc <= 4000) return 8000;
+            return 9000; 
+        }
+
+        if (category === 'r_minitruck_bus') return 8000; 
+        if (category === 'r_minitipper') return 9000; 
+        if (category === 'r_truck_bus') return 10500; 
+        if (category === 'r_heavy_machinery') return 15500; 
+        if (category === 'r_oil_gas_container') return 15500; 
+        if (category === 'r_tractor') return 2500; 
+        if (category === 'r_power_tiller') return 2000; 
+        if (category === 'r_three_wheeler') return 2500; 
+
+        if (category === 'r_car_electric') {
+            const kw = parseInt(document.getElementById('kwInput').value) || 0;
+            if (kw <= 50) return 3000;
+            if (kw <= 125) return 4000;
+            if (kw <= 200) return 6000;
+            return 7500; 
+        }
+
+        return 0;
+    }
+
+    function getRenewalRateFromDocument(category) {
+        if (category === 'p_bike_fuel' || category === 'p_bike_electric') return 300;
+
+        const smallVehicles = ['p_car_jeep', 'p_three_wheeler', 'p_power_tiller', 'p_car_electric'];
+        if (smallVehicles.includes(category)) return 400; 
+        
+        const smallCommercial = ['r_car_jeep', 'r_three_wheeler', 'r_power_tiller', 'r_car_electric'];
+        if (smallCommercial.includes(category)) return 500; 
+
+        const mediumVehicles = ['p_minitruck_bus', 'p_minitipper', 'p_tractor'];
+        if (mediumVehicles.includes(category)) return 500; 
+
+        const mediumCommercial = ['r_minitruck_bus', 'r_minitipper', 'r_tractor'];
+        if (mediumCommercial.includes(category)) return 700; 
+
+        const largeVehicles = ['p_machinery_heavy', 'p_tipper_container', 'p_truck_bus', 'p_oil_gas'];
+        if (largeVehicles.includes(category)) return 600; 
+
+        const largeCommercial = ['r_heavy_machinery', 'r_truck_bus', 'r_oil_gas_container'];
+        if (largeCommercial.includes(category)) return 1000; 
+
+        return 300; 
+    }
+
+    function getFYStartYear(year, month) {
+        return (month >= 4) ? year : year - 1;
+    }
+
+    function calculateDaysDifference(y1, m1, d1, y2, m2, d2) {
+        const totalDays1 = (y1 * 365) + (m1 * 30) + d1;
+        const totalDays2 = (y2 * 365) + (m2 * 30) + d2;
+        return totalDays2 - totalDays1;
+    }
+
+    function calculateTax() {
+        const vehNum = document.getElementById('vehicleNumber').value.trim();
+        const category = document.getElementById('vehicleCategory').value;
+        const expiry = document.getElementById('expiryInput').value;
+        const payment = document.getElementById('paymentInput').value;
+
+        if (!expiry || !payment) {
+            alert("कृपया सही ढाँचामा आवश्यक मितिहरू उल्लेख गर्नुहोस्।");
+            return;
+        }
+
+        document.getElementById('metaVehicleNum').innerText = `सवारी साधन नं: ${vehNum ? vehNum : 'उल्लेख नगरिएको'}`;
+        document.getElementById('metaDateInfo').innerText = `कर बुझाउने मिति: ${payment}`;
+
+        const annualTax = getTaxRateFromDocument(category);
+        const baseIncomeTax = getBaseIncomeTaxRate(category);
+        const BASE_RENEWAL = getRenewalRateFromDocument(category); 
+
+        const [expYear, expMonth, expDay] = expiry.split('-').map(Number);
+        const [payYear, payMonth, payDay] = payment.split('-').map(Number);
+
+        const initialExpiredFY = getFYStartYear(expYear, expMonth);
+        const currentPaymentFY = getFYStartYear(payYear, payMonth);
+
+        // क्रिटिकल कन्डिसन: यदि म्याद सकिने आर्थिक वर्ष र हालको वर्ष एउटै हो र म्याद बाँकी नै छ (Already Paid) भने हिसाब नगर्ने
+        if (initialExpiredFY === currentPaymentFY && (expYear > payYear || (expYear === payYear && expMonth > payMonth) || (expYear === payYear && expMonth === payMonth && expDay >= payDay))) {
+            const tbody = document.getElementById('tableBody');
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #16a34a; font-weight: 600; padding: 20px;">यस आर्थिक वर्षको कर पहिले नै चुक्ता भइसकेको छ। थप शुल्क लाग्ने छैन।</td></tr>';
+            document.getElementById('grandTotalText').innerText = `Rs. 0/-`;
+            document.getElementById('resultBox').style.display = 'block';
+            return;
+        }
+
+        const daysPassed = calculateDaysDifference(expYear, expMonth, expDay, payYear, payMonth, payDay);
+
+        let totalTax = 0;
+        let totalFine = 0;
+        let totalRenewal = 0;
+        let totalIncomeTax = 0;
+        
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = ''; 
+
+        // लुपले बक्यौता आर्थिक वर्षदेखि चालु आर्थिक वर्षसम्म मात्र गणना गर्छ
+        for (let fy = initialExpiredFY; fy <= currentPaymentFY; fy++) {
+            let fyLabel = `${fy}/${(fy + 1) % 100}`;
+            let taxFinePercentage = 0;
+            let currentYearRenewal = BASE_RENEWAL;
+
+            if (fy < currentPaymentFY) {
+                let yearsLate = (currentPaymentFY - fy);
+                if (yearsLate === 1) taxFinePercentage = 0.40;
+                else if (yearsLate === 2) taxFinePercentage = 0.60;
+                else if (yearsLate === 3) taxFinePercentage = 0.80;
+                else taxFinePercentage = 1.00;
+                
+                currentYearRenewal = BASE_RENEWAL * 2; 
+            } 
+            else {
+                if (payMonth === 4 || payMonth === 5 || payMonth === 6) { 
+                    taxFinePercentage = 0.00;
+                } else if (payMonth === 7 || payMonth === 8 || payMonth === 9) { 
+                    taxFinePercentage = 0.05;
+                } else if (payMonth === 10 || payMonth === 11 || payMonth === 12) { 
+                    taxFinePercentage = 0.10;
+                } else if (payMonth === 1 || payMonth === 2 || (payMonth === 3 && payDay <= 32)) { 
+                    taxFinePercentage = 0.20;
+                }
+
+                if (category === 'p_bike_fuel' || category === 'p_bike_electric') {
+                    if (daysPassed <= 90) {
+                        currentYearRenewal = 300; 
+                    } else {
+                        currentYearRenewal = 600; 
+                    }
+                } else {
+                    if (payMonth > 6 || payMonth <= 3) { 
+                        currentYearRenewal = BASE_RENEWAL * 2;
+                    }
+                }
+            }
+
+            let fyTax = annualTax;
+            let fyTaxFine = fyTax * taxFinePercentage;
+
+            let additionalFineIncomeTax = 0;
+            if (category.startsWith('r_') && fyTaxFine > 0) {
+                additionalFineIncomeTax = fyTaxFine * 0.25;
+            }
+            let currentYearIncomeTax = baseIncomeTax + additionalFineIncomeTax;
+
+            let rowTotal = fyTax + fyTaxFine + currentYearRenewal + currentYearIncomeTax;
+
+            totalTax += fyTax;
+            totalFine += fyTaxFine;
+            totalRenewal += currentYearRenewal;
+            totalIncomeTax += currentYearIncomeTax;
+
+            const row = document.createElement('tr');
+            let fineBadge = fyTaxFine > 0 ? ` <span class="badge">${(taxFinePercentage * 100).toFixed(0)}%</span>` : '';
+            let incomeTaxDetails = additionalFineIncomeTax > 0 ? `<br><span class="badge-income">२५% जरिवाना थप: Rs. ${additionalFineIncomeTax.toLocaleString()}</span>` : '';
+
+            row.innerHTML = `
+                <td><strong>${fyLabel}</strong></td>
+                <td class="text-right">Rs. ${fyTax.toLocaleString()}</td>
+                <td class="text-right">Rs. ${fyTaxFine.toLocaleString()}${fineBadge}</td>
+                <td class="text-right">Rs. ${currentYearRenewal.toLocaleString()}</td>
+                <td class="text-right">Rs. ${currentYearIncomeTax.toLocaleString()}${incomeTaxDetails}</td>
+                <td class="text-right"><strong>Rs. ${rowTotal.toLocaleString()}</strong></td>
+            `;
+            tbody.appendChild(row);
+        }
+
+        const grandTotal = totalTax + totalFine + totalRenewal + totalIncomeTax;
+        document.getElementById('grandTotalText').innerText = `Rs. ${grandTotal.toLocaleString()}/-`;
+        document.getElementById('resultBox').style.display = 'block';
+        document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth' });
+    }
+</script>
+
+</body>
+</html>
