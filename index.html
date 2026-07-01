@@ -3,13 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>सवारी साधन कर क्यालकुलेटर - यातायात व्यवस्था कार्यालय, बागलुङ</title>
+    <title>सवारी साधन कर क्यालकुलेटर (Admin Control) - बागलुङ</title>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --primary: #0284c7; /* Sky Blue Primary */
+            --primary: #0284c7; 
             --primary-dark: #0369a1;
             --primary-light: #e0f2fe;
             --secondary: #e11d48;
@@ -19,6 +19,8 @@
             --text-body: #334155;
             --border: #bae6fd;
             --shadow: 0 10px 30px -5px rgba(2, 132, 199, 0.1), 0 8px 15px -6px rgba(2, 132, 199, 0.05);
+            --admin-color: #4f46e5;
+            --admin-dark: #3730a3;
         }
 
         * {
@@ -254,17 +256,6 @@
             font-size: 12px;
             font-weight: 500;
         }
-        
-        .badge-income {
-            background-color: #fef3c7;
-            color: #d97706;
-            padding: 2px 6px;
-            border-radius: 6px;
-            font-size: 11px;
-            font-weight: 500;
-            display: inline-block;
-            margin-top: 2px;
-        }
 
         .invoice-total-block {
             background: linear-gradient(135deg, #f0fdf4, #dcfce7);
@@ -288,6 +279,61 @@
             color: #15803d;
         }
 
+        /* --- Admin Section Styles --- */
+        .admin-toggle-btn {
+            background: #64748b;
+            margin-top: 20px;
+            max-width: 250px;
+            align-self: center;
+        }
+        .admin-toggle-btn:hover {
+            background: #475569;
+        }
+
+        .admin-card {
+            display: none;
+            border: 2px dashed var(--admin-color);
+            background: #fafafa;
+            margin-top: 20px;
+        }
+
+        .admin-card .section-title::before {
+            background-color: var(--admin-color);
+        }
+        
+        .admin-card .section-title {
+            color: var(--admin-dark);
+        }
+
+        .admin-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+            margin-bottom: 20px;
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+            border: 1px solid #e2e8f0;
+        }
+
+        .admin-subtitle {
+            grid-column: 1 / -1;
+            font-size: 14px;
+            font-weight: 700;
+            color: #475569;
+            border-bottom: 1px solid #cbd5e1;
+            padding-bottom: 5px;
+            margin-top: 10px;
+        }
+
+        .btn-admin-save {
+            background: linear-gradient(135deg, var(--admin-color), var(--admin-dark));
+            box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+        }
+        .btn-admin-save:hover {
+            background: linear-gradient(135deg, var(--admin-dark), #231f70);
+        }
+
         .footer {
             text-align: center;
             font-size: 13px;
@@ -304,51 +350,18 @@
         }
 
         @media print {
-            body {
-                background-color: #ffffff;
-                padding: 0;
-            }
-            .top-stripe, .card:not(.result-box), button, .footer {
+            .admin-card, .admin-toggle-btn, .top-stripe, .card:not(.result-box), button, .footer {
                 display: none !important;
             }
-            .header {
-                box-shadow: none;
-                border-bottom: 2px solid #000;
-                border-radius: 0;
-                margin-bottom: 20px;
-                padding: 10px 0;
-            }
-            .main-wrapper {
-                width: 100%;
-                max-width: 100%;
-            }
-            .result-box {
-                display: block !important;
-                box-shadow: none;
-                border: none;
-                padding: 0;
-            }
-            .invoice-meta-info {
-                background-color: #f1f5f9 !important;
-                color: #000 !important;
-                border: 1px solid #cbd5e1;
-            }
-            th {
-                background-color: #f1f5f9 !important;
-                color: #000 !important;
-                border-bottom: 2px solid #000 !important;
-            }
-            td, th {
-                border-bottom: 1px solid #cbd5e1 !important;
-            }
-            .invoice-total-block {
-                background: #f8fafc !important;
-                border: 1px solid #000 !important;
-                color: #000 !important;
-            }
-            .total-label, .total-amount {
-                color: #000 !important;
-            }
+            body { background-color: #fff; padding: 0; }
+            .header { box-shadow: none; border-bottom: 2px solid #000; border-radius: 0; margin-bottom: 20px; padding: 10px 0; }
+            .main-wrapper { width: 100%; max-width: 100%; }
+            .result-box { display: block !important; box-shadow: none; border: none; padding: 0; }
+            .invoice-meta-info { background-color: #f1f5f9 !important; color: #000 !important; border: 1px solid #cbd5e1; }
+            th { background-color: #f1f5f9 !important; color: #000 !important; border-bottom: 2px solid #000 !important; }
+            td, th { border-bottom: 1px solid #cbd5e1 !important; }
+            .invoice-total-block { background: #f8fafc !important; border: 1px solid #000 !important; }
+            .total-label, .total-amount { color: #000 !important; }
         }
     </style>
 </head>
@@ -363,8 +376,9 @@
 </div>
 
 <div class="main-wrapper">
+    <!-- Main Calculator Card -->
     <div class="card">
-        <div class="section-title">सवारी साधन कर, नवीकरण तथा आयकर गणना (परिमार्जित मोटरसाइकल नवीकरण नियम)</div>
+        <div class="section-title">सवारी साधन कर, नवीकरण तथा आयकर गणना</div>
         
         <div class="form-grid">
             <div class="form-group full-width">
@@ -377,30 +391,7 @@
                 <select id="vehicleCategory" onchange="handleCategoryChange()">
                     <optgroup label="१. निजी सवारी साधन (Private Vehicles)">
                         <option value="p_bike_fuel" selected>मोटर साइकल तथा स्कुटर (इन्धन / CC आधारित)</option>
-                        <option value="p_car_jeep">कार, जीप, भ्यान, माइक्रो बस (CC आधारित)</option>
-                        <option value="p_machinery_heavy">डोजर, एक्साभेटर, लोडर, रोलर, क्रेन जस्ता मेशिनरी</option>
-                        <option value="p_tipper_container">ट्रिपर / कन्टेनर ट्रक</option>
-                        <option value="p_minitipper">मिनीट्रिपर</option>
-                        <option value="p_three_wheeler">अटो रिक्सा, THREE WHEELER र टेम्पो</option>
-                        <option value="p_tractor">ट्र्याक्टर</option>
-                        <option value="p_power_tiller">पावर टिलर</option>
-                        <option value="p_minitruck_bus">मिनीट्रक / मिनीबस</option>
-                        <option value="p_truck_bus">ट्रक र बस</option>
-                        <option value="p_oil_gas">तेल ट्यांकर, ग्याँस बुलेट</option>
                         <option value="p_bike_electric">विद्युतीय मोटरसाइकल / स्कुटर (Watt आधारित)</option>
-                        <option value="p_car_electric">विद्युतीय कार, जीप, भ्यान, माइक्रोबस, बस (kW आधारित)</option>
-                    </optgroup>
-                    <optgroup label="२. भाडामा दर्ता भएका सवारी साधन (Commercial Vehicles)">
-                        <option value="r_car_jeep">कार, जिप, भ्यान, माइक्रो बस (CC आधारित)</option>
-                        <option value="r_heavy_machinery">डोजर, एक्साभेटर, लोडर, क्रेन (मेशिनरी उपकरण)</option>
-                        <option value="r_minitipper">मिनी ट्रिपर</option>
-                        <option value="r_three_wheeler">अटो रिक्सा, थ्री ह्वीलर र टेम्पो</option>
-                        <option value="r_tractor">ट्र्याक्टर</option>
-                        <option value="r_power_tiller">पावर टिलर</option>
-                        <option value="r_minitruck_bus">मिनीट्रक, मिनीबस, पानी ट्याङ्कर</option>
-                        <option value="r_truck_bus">ट्रक र बस</option>
-                        <option value="r_oil_gas_container">तेल ट्याङ्कर, ग्याँस बुलेट, ट्रिपर</option>
-                        <option value="r_car_electric">विद्युतीय सवारी साधन (kW आधारित)</option>
                     </optgroup>
                 </select>
             </div>
@@ -415,11 +406,6 @@
                 <input type="number" id="wattInput" placeholder="उदाहरण: 1200" value="1200">
             </div>
 
-            <div class="form-group full-width" id="kwGroup" style="display: none;">
-                <label for="kwInput">मोटर क्षमता - किलोवाट (Motor Capacity in kW)</label>
-                <input type="number" id="kwInput" placeholder="उदाहरण: 60" value="60">
-            </div>
-
             <div class="form-group">
                 <label for="expiryInput">ब्लूबुक नवीकरण म्याद सकिएको मिति (BS)</label>
                 <input type="text" id="expiryInput" placeholder="YYYY-MM-DD" value="2081-04-01">
@@ -432,11 +418,11 @@
         </div>
 
         <button onclick="calculateTax()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><line x1="9" y1="9" x2="15" y2="9"></line><line x1="9" y1="13" x2="15" y2="13"></line><line x1="9" y1="17" x2="15" y2="17"></line><line x1="12" y1="9" x2="12" height="8" y2="17"></line></svg>
             कर तथा जरिवाना हिसाब गर्नुहोस्
         </button>
     </div>
 
+    <!-- Bill Results Card -->
     <div id="resultBox" class="card result-box">
         <div class="section-title">राजस्व गणना विवरण (Estimated Tax Bill)</div>
         
@@ -453,7 +439,6 @@
                         <th class="text-right">वार्षिक मूल कर</th>
                         <th class="text-right">कर जरिवाना</th>
                         <th class="text-right">नवीकरण दस्तुर र जरिवाना</th>
-                        <th class="text-right">आयकर (भाडा)</th>
                         <th class="text-right">जम्मा</th>
                     </tr>
                 </thead>
@@ -466,10 +451,74 @@
             <div id="grandTotalText" class="total-amount">Rs. 0/-</div>
         </div>
 
-        <button class="btn-print" onclick="window.print()">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 6 2 18 2 18 9"></polyline><path d="M6 18H4a2 2 0 0 1-2-2v-5a2 2 0 0 1 2-2h16a2 2 0 0 1 2 2v5a2 2 0 0 1-2 2h-2"></path><rect x="6" y="14" width="12" height="8"></rect></svg>
-            प्रिन्ट गर्नुहोस् (Print Invoice)
-        </button>
+        <button class="btn-print" onclick="window.print()">प्रिन्ट गर्नुहोस् (Print Invoice)</button>
+    </div>
+
+    <!-- Toggle Admin Panel Button -->
+    <button class="admin-toggle-btn" onclick="toggleAdminPanel()">⚙️ Admin Panel (दूरी परिवर्तन)</button>
+
+    <!-- Admin Panel Card -->
+    <div id="adminPanel" class="card admin-card">
+        <div class="section-title">प्रशासकीय नियन्त्रण (Admin Rate Settings)</div>
+        <p style="font-size: 13px; margin-bottom: 15px; color:#64748b;">यहाँबाट परिवर्तन गरिएको दर तत्कालै क्यालकुलेटरमा लागू हुनेछ र ब्राउजरमा सुरक्षित रहनेछ।</p>
+        
+        <div class="admin-grid">
+            <div class="admin-subtitle">१. मोटरसाइकल/स्कुटर नवीकरण दस्तुर (Base Renewal Rates)</div>
+            <div class="form-group">
+                <label for="adm_renewal_bike">नवीकरण दस्तुर (रु.)</label>
+                <input type="number" id="adm_renewal_bike">
+            </div>
+
+            <div class="admin-subtitle">२. इन्धन मोटरसाइकल वार्षिक कर दरहरू (Fuel Bike CC Rates)</div>
+            <div class="form-group">
+                <label>१२५ CC सम्म</label>
+                <input type="number" id="adm_cc_125">
+            </div>
+            <div class="form-group">
+                <label>१२६ - १५० CC</label>
+                <input type="number" id="adm_cc_150">
+            </div>
+            <div class="form-group">
+                <label>१५१ - २२५ CC</label>
+                <input type="number" id="adm_cc_225">
+            </div>
+            <div class="form-group">
+                <label>२२६ - ४०० CC</label>
+                <input type="number" id="adm_cc_400">
+            </div>
+            <div class="form-group">
+                <label>४MDE - ६५० CC</label>
+                <input type="number" id="adm_cc_650">
+            </div>
+            <div class="form-group">
+                <label>६५१ CC माथि</label>
+                <input type="number" id="adm_cc_above">
+            </div>
+
+            <div class="admin-subtitle">३. विद्युतीय मोटरसाइकल वार्षिक कर दरहरू (Electric Bike Watt Rates)</div>
+            <div class="form-group">
+                <label>५० Watt सम्म</label>
+                <input type="number" id="adm_w_50">
+            </div>
+            <div class="form-group">
+                <label>५१ - ३५० Watt</label>
+                <input type="number" id="adm_w_350">
+            </div>
+            <div class="form-group">
+                <label>३५१ - १००० Watt</label>
+                <input type="number" id="adm_w_1000">
+            </div>
+            <div class="form-group">
+                <label>१MDA - १५०० Watt</label>
+                <input type="number" id="adm_w_1500">
+            </div>
+            <div class="form-group">
+                <label>१५MDE Watt माथि</label>
+                <input type="number" id="adm_w_above">
+            </div>
+        </div>
+
+        <button class="btn-admin-save" onclick="saveAdminRates()">💾 नयाँ दरहरू सुरक्षित गर्नुहोस् (Save Rates)</button>
     </div>
 </div>
 
@@ -479,164 +528,123 @@
 </div>
 
 <script>
+    // डिफल्ट दरहरू (यदि localStorage मा केहि छैन भने यो लोड हुन्छ)
+    const defaultRates = {
+        renewal_bike: 300,
+        // CC Rates
+        cc_125: 3000,
+        cc_150: 5000,
+        cc_225: 6500,
+        cc_400: 11000,
+        cc_650: 20000,
+        cc_above: 30000,
+        // Watt Rates
+        w_50: 1000,
+        w_350: 1500,
+        w_1000: 2000,
+        w_1500: 2500,
+        w_above: 3000
+    };
+
+    let systemRates = {};
+
     document.addEventListener("DOMContentLoaded", function() {
         document.getElementById('paymentInput').value = "2083-03-15";
+        loadRates();
     });
+
+    // LocalStorage बाट रेटहरू तान्ने वा डिफल्ट सेट गर्ने फङ्सन
+    function loadRates() {
+        const localData = localStorage.getItem('vrs_calculated_rates');
+        if (localData) {
+            systemRates = JSON.parse(localData);
+        } else {
+            systemRates = { ...defaultRates };
+            localStorage.setItem('vrs_calculated_rates', JSON.stringify(systemRates));
+        }
+        
+        // एडमिन प्यानलका इन्पुट बक्सहरूमा दरहरू भर्ने
+        document.getElementById('adm_renewal_bike').value = systemRates.renewal_bike;
+        document.getElementById('adm_cc_125').value = systemRates.cc_125;
+        document.getElementById('adm_cc_150').value = systemRates.cc_150;
+        document.getElementById('adm_cc_225').value = systemRates.cc_225;
+        document.getElementById('adm_cc_400').value = systemRates.cc_400;
+        document.getElementById('adm_cc_650').value = systemRates.cc_650;
+        document.getElementById('adm_cc_above').value = systemRates.cc_above;
+        
+        document.getElementById('adm_w_50').value = systemRates.w_50;
+        document.getElementById('adm_w_350').value = systemRates.w_350;
+        document.getElementById('adm_w_1000').value = systemRates.w_1000;
+        document.getElementById('adm_w_1500').value = systemRates.w_1500;
+        document.getElementById('adm_w_above').value = systemRates.w_above;
+    }
+
+    // एडमिनले चेन्ज गरेको दरहरू सेभ गर्ने फङ्सन
+    function saveAdminRates() {
+        systemRates.renewal_bike = parseInt(document.getElementById('adm_renewal_bike').value) || 0;
+        systemRates.cc_125 = parseInt(document.getElementById('adm_cc_125').value) || 0;
+        systemRates.cc_150 = parseInt(document.getElementById('adm_cc_150').value) || 0;
+        systemRates.cc_225 = parseInt(document.getElementById('adm_cc_225').value) || 0;
+        systemRates.cc_400 = parseInt(document.getElementById('adm_cc_400').value) || 0;
+        systemRates.cc_650 = parseInt(document.getElementById('adm_cc_650').value) || 0;
+        systemRates.cc_above = parseInt(document.getElementById('adm_cc_above').value) || 0;
+        
+        systemRates.w_50 = parseInt(document.getElementById('adm_w_50').value) || 0;
+        systemRates.w_350 = parseInt(document.getElementById('adm_w_350').value) || 0;
+        systemRates.w_1000 = parseInt(document.getElementById('adm_w_1000').value) || 0;
+        systemRates.w_1500 = parseInt(document.getElementById('adm_w_1500').value) || 0;
+        systemRates.w_above = parseInt(document.getElementById('adm_w_above').value) || 0;
+
+        localStorage.setItem('vrs_calculated_rates', JSON.stringify(systemRates));
+        alert("सफलतापूर्वक नयाँ कर तथा नवीकरण दरहरू सुरक्षित गरियो!");
+        
+        if(document.getElementById('resultBox').style.display === 'block') {
+            calculateTax(); // यदि परिणाम खुला छ भने तुरुन्तै रि-क्याल्कुलेट गर्ने
+        }
+    }
+
+    function toggleAdminPanel() {
+        const panel = document.getElementById('adminPanel');
+        if (panel.style.display === 'block') {
+            panel.style.display = 'none';
+        } else {
+            panel.style.display = 'block';
+            panel.scrollIntoView({ behavior: 'smooth' });
+        }
+    }
 
     function handleCategoryChange() {
         const category = document.getElementById('vehicleCategory').value;
-        
         document.getElementById('ccGroup').style.display = 'none';
         document.getElementById('wattGroup').style.display = 'none';
-        document.getElementById('kwGroup').style.display = 'none';
 
-        if (category === 'p_bike_fuel' || category === 'p_car_jeep' || category === 'r_car_jeep') {
+        if (category === 'p_bike_fuel') {
             document.getElementById('ccGroup').style.display = 'flex';
         } else if (category === 'p_bike_electric') {
             document.getElementById('wattGroup').style.display = 'flex';
-        } else if (category === 'p_car_electric' || category === 'r_car_electric') {
-            document.getElementById('kwGroup').style.display = 'flex';
         }
     }
 
-    function getTaxRateFromDocument(category) {
+    function getTaxRate(category) {
         if (category === 'p_bike_fuel') {
             const cc = parseInt(document.getElementById('ccInput').value) || 0;
-            if (cc <= 125) return 3000;
-            if (cc <= 150) return 5000;
-            if (cc <= 225) return 6500;
-            if (cc <= 400) return 11000;
-            if (cc <= 650) return 20000;
-            return 30000;
+            if (cc <= 125) return systemRates.cc_125;
+            if (cc <= 150) return systemRates.cc_150;
+            if (cc <= 225) return systemRates.cc_225;
+            if (cc <= 400) return systemRates.cc_400;
+            if (cc <= 650) return systemRates.cc_650;
+            return systemRates.cc_above;
         }
         
-        if (category === 'p_car_jeep') {
-            const cc = parseInt(document.getElementById('ccInput').value) || 0;
-            if (cc <= 1000) return 22000;
-            if (cc <= 1500) return 25000;
-            if (cc <= 2000) return 27000;
-            if (cc <= 2500) return 37000;
-            if (cc <= 3000) return 50000;
-            if (cc <= 3500) return 60000;
-            return 65000;
-        }
-
         if (category === 'p_bike_electric') {
             const watt = parseInt(document.getElementById('wattInput').value) || 0;
-            if (watt <= 50) return 1000;
-            if (watt <= 350) return 1500;
-            if (watt <= 1000) return 2000;
-            if (watt <= 1500) return 2500;
-            return 3000;
+            if (watt <= 50) return systemRates.w_50;
+            if (watt <= 350) return systemRates.w_350;
+            if (watt <= 1000) return systemRates.w_1000;
+            if (watt <= 1500) return systemRates.w_1500;
+            return systemRates.w_above;
         }
-
-        if (category === 'p_car_electric') {
-            const kw = parseInt(document.getElementById('kwInput').value) || 0;
-            if (kw <= 50) return 12000;
-            if (kw <= 100) return 17000;
-            if (kw <= 150) return 22000;
-            if (kw <= 200) return 27000;
-            return 32000;
-        }
-
-        if (category === 'r_car_jeep') {
-            const cc = parseInt(document.getElementById('ccInput').value) || 0;
-            if (cc <= 1000) return 11000;
-            if (cc <= 1500) return 12500;
-            if (cc <= 2000) return 13500;
-            if (cc <= 2500) return 14500;
-            if (cc <= 3000) return 16500;
-            if (cc <= 3500) return 17500;
-            if (cc <= 4000) return 19000;
-            return 22000;
-        }
-
-        if (category === 'r_car_electric') {
-            const kw = parseInt(document.getElementById('kwInput').value) || 0;
-            if (kw <= 50) return 10000;
-            if (kw <= 100) return 15000;
-            if (kw <= 150) return 20000;
-            if (kw <= 200) return 25000;
-            return 30000;
-        }
-
-        const documentFixedRates = {
-            'p_machinery_heavy': 40000,
-            'p_tipper_container': 42000,
-            'p_minitipper': 30000,
-            'p_three_wheeler': 6000,
-            'p_tractor': 11000,
-            'p_power_tiller': 4500,
-            'p_minitruck_bus': 27000,
-            'p_truck_bus': 35000,
-            'p_oil_gas': 35000,
-            'r_heavy_machinery': 22000,
-            'r_minitipper': 21000,
-            'r_three_wheeler': 6000,
-            'r_tractor': 8000,
-            'r_power_tiller': 4500,
-            'r_minitruck_bus': 15000,
-            'r_truck_bus': 20000,
-            'r_oil_gas_container': 22000
-        };
-
-        return documentFixedRates[category] || 0;
-    }
-
-    function getBaseIncomeTaxRate(category) {
-        if (!category.startsWith('r_')) return 0; 
-
-        if (category === 'r_car_jeep') {
-            const cc = parseInt(document.getElementById('ccInput').value) || 0;
-            if (cc <= 1300) return 5500;
-            if (cc <= 2000) return 6000;
-            if (cc <= 2900) return 6500;
-            if (cc <= 4000) return 8000;
-            return 9000; 
-        }
-
-        if (category === 'r_minitruck_bus') return 8000; 
-        if (category === 'r_minitipper') return 9000; 
-        if (category === 'r_truck_bus') return 10500; 
-        if (category === 'r_heavy_machinery') return 15500; 
-        if (category === 'r_oil_gas_container') return 15500; 
-        if (category === 'r_tractor') return 2500; 
-        if (category === 'r_power_tiller') return 2000; 
-        if (category === 'r_three_wheeler') return 2500; 
-
-        if (category === 'r_car_electric') {
-            const kw = parseInt(document.getElementById('kwInput').value) || 0;
-            if (kw <= 50) return 3000;
-            if (kw <= 125) return 4000;
-            if (kw <= 200) return 6000;
-            return 7500; 
-        }
-
         return 0;
-    }
-
-    function getRenewalRateFromDocument(category) {
-        if (category === 'p_bike_fuel' || category === 'p_bike_electric') return 300;
-
-        const smallVehicles = ['p_car_jeep', 'p_three_wheeler', 'p_power_tiller', 'p_car_electric'];
-        if (smallVehicles.includes(category)) return 400; 
-        
-        const smallCommercial = ['r_car_jeep', 'r_three_wheeler', 'r_power_tiller', 'r_car_electric'];
-        if (smallCommercial.includes(category)) return 500; 
-
-        const mediumVehicles = ['p_minitruck_bus', 'p_minitipper', 'p_tractor'];
-        if (mediumVehicles.includes(category)) return 500; 
-
-        const mediumCommercial = ['r_minitruck_bus', 'r_minitipper', 'r_tractor'];
-        if (mediumCommercial.includes(category)) return 700; 
-
-        const largeVehicles = ['p_machinery_heavy', 'p_tipper_container', 'p_truck_bus', 'p_oil_gas'];
-        if (largeVehicles.includes(category)) return 600; 
-
-        const largeCommercial = ['r_heavy_machinery', 'r_truck_bus', 'r_oil_gas_container'];
-        if (largeCommercial.includes(category)) return 1000; 
-
-        return 300; 
     }
 
     function getFYStartYear(year, month) {
@@ -656,16 +664,15 @@
         const payment = document.getElementById('paymentInput').value;
 
         if (!expiry || !payment) {
-            alert("कृपया सही ढाँचामा आवश्यक मितिहरू उल्लेख गर्नुहोस्।");
+            alert("कृपया सही मितिहरू उल्लेख गर्नुहोस्।");
             return;
         }
 
         document.getElementById('metaVehicleNum').innerText = `सवारी साधन नं: ${vehNum ? vehNum : 'उल्लेख नगरिएको'}`;
         document.getElementById('metaDateInfo').innerText = `कर बुझाउने मिति: ${payment}`;
 
-        const annualTax = getTaxRateFromDocument(category);
-        const baseIncomeTax = getBaseIncomeTaxRate(category);
-        const BASE_RENEWAL = getRenewalRateFromDocument(category);
+        const annualTax = getTaxRate(category);
+        const BASE_RENEWAL = systemRates.renewal_bike; // एडमिन द्वारा सेट गरिएको ब्याकअप दस्तुर
 
         const [expYear, expMonth, expDay] = expiry.split('-').map(Number);
         const [payYear, payMonth, payDay] = payment.split('-').map(Number);
@@ -675,7 +682,7 @@
 
         if (initialExpiredFY === currentPaymentFY && (expYear > payYear || (expYear === payYear && expMonth > payMonth) || (expYear === payYear && expMonth === payMonth && expDay >= payDay))) {
             const tbody = document.getElementById('tableBody');
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #16a34a; font-weight: 600; padding: 20px;">यस आर्थिक वर्षको कर पहिले नै चुक्ता भइसकेको छ। थप शुल्क लाग्ने छैन।</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="5" style="text-align: center; color: #16a34a; font-weight: 600; padding: 20px;">यस आर्थिक वर्षको कर पहिले नै चुक्ता भइसकेको छ।</td></tr>';
             document.getElementById('grandTotalText').innerText = `Rs. 0/-`;
             document.getElementById('resultBox').style.display = 'block';
             return;
@@ -686,12 +693,9 @@
         let totalTax = 0;
         let totalFine = 0;
         let totalRenewal = 0;
-        let totalIncomeTax = 0;
         
         const tbody = document.getElementById('tableBody');
         tbody.innerHTML = ''; 
-
-        const isBike = (category === 'p_bike_fuel' || category === 'p_bike_electric');
 
         for (let fy = initialExpiredFY; fy <= currentPaymentFY; fy++) {
             let fyLabel = `${fy}/${(fy + 1) % 100}`;
@@ -707,66 +711,40 @@
                 else if (yearsLate === 3) taxFinePercentage = 0.80;
                 else taxFinePercentage = 1.00;
 
-                if (isBike) {
-                    // नयाँ नियम: नवीकरण ३०० + १००% जरिवाना ३०० + थप नवीकरण ३०० = ९००
-                    currentYearRenewal = 300 + 300 + 300;
-                    isSpecialBikeFineApplied = true;
-                } else {
-                    currentYearRenewal = BASE_RENEWAL * 2;
-                }
+                // बक्यौता वर्ष: मूल नवीकरण + १००% जरिवाना + थप दस्तुर (अर्थात् BASE_RENEWAL * 3)
+                currentYearRenewal = BASE_RENEWAL + BASE_RENEWAL + BASE_RENEWAL;
+                isSpecialBikeFineApplied = true;
             } 
             else {
-                if (payMonth === 4 || payMonth === 5 || payMonth === 6) { 
-                    taxFinePercentage = 0.00;
-                } else if (payMonth === 7 || payMonth === 8 || payMonth === 9) { 
-                    taxFinePercentage = 0.05;
-                } else if (payMonth === 10 || payMonth === 11 || payMonth === 12) { 
-                    taxFinePercentage = 0.10;
-                } else if (payMonth === 1 || payMonth === 2 || (payMonth === 3 && payDay <= 32)) { 
-                    taxFinePercentage = 0.20;
-                }
+                if (payMonth === 4 || payMonth === 5 || payMonth === 6) taxFinePercentage = 0.00;
+                else if (payMonth === 7 || payMonth === 8 || payMonth === 9) taxFinePercentage = 0.05;
+                else if (payMonth === 10 || payMonth === 11 || payMonth === 12) taxFinePercentage = 0.10;
+                else if (payMonth === 1 || payMonth === 2 || (payMonth === 3 && payDay <= 32)) taxFinePercentage = 0.20;
 
-                if (isBike) {
-                    if (daysPassed > 90) {
-                        currentYearRenewal = 300 + 300;
-                        isBike3MonthFineApplied = true;
-                    } else {
-                        currentYearRenewal = 300;
-                    }
+                if (daysPassed > 90) {
+                    currentYearRenewal = BASE_RENEWAL + BASE_RENEWAL;
+                    isBike3MonthFineApplied = true;
                 } else {
-                    if (payMonth > 6 || payMonth <= 3) { 
-                        currentYearRenewal = BASE_RENEWAL * 2;
-                    }
+                    currentYearRenewal = BASE_RENEWAL;
                 }
             }
 
             let fyTax = annualTax;
             let fyTaxFine = fyTax * taxFinePercentage;
-
-            let additionalFineIncomeTax = 0;
-            if (category.startsWith('r_') && fyTaxFine > 0) {
-                additionalFineIncomeTax = fyTaxFine * 0.25;
-            }
-            let currentYearIncomeTax = baseIncomeTax + additionalFineIncomeTax;
-
-            let rowTotal = fyTax + fyTaxFine + currentYearRenewal + currentYearIncomeTax;
+            let rowTotal = fyTax + fyTaxFine + currentYearRenewal;
 
             totalTax += fyTax;
             totalFine += fyTaxFine;
             totalRenewal += currentYearRenewal;
-            totalIncomeTax += currentYearIncomeTax;
 
             const row = document.createElement('tr');
             let fineBadge = fyTaxFine > 0 ? ` <span class="badge">${(taxFinePercentage * 100).toFixed(0)}%</span>` : '';
-            let incomeTaxDetails = additionalFineIncomeTax > 0 ? `<br><span class="badge-income">२५% जरिवाना थप: Rs. ${additionalFineIncomeTax.toLocaleString()}</span>` : '';
             
             let renewalLabel = `Rs. ${currentYearRenewal.toLocaleString()}`;
             if (isSpecialBikeFineApplied) {
-                renewalLabel += ` <span class="badge">(नवीकरण + १००% जरिवाना + ३०० थप)</span>`;
+                renewalLabel += ` <span class="badge">(नवीकरण + १००% जरिवाना + ${BASE_RENEWAL} थप)</span>`;
             } else if (isBike3MonthFineApplied) {
                 renewalLabel += ` <span class="badge">(३ महिना नाघेको १००%)</span>`;
-            } else if (fy < currentPaymentFY && !isBike) {
-                renewalLabel += ` <span class="badge">(म्याद नाघेको दस्तुर दोब्बर)</span>`;
             }
 
             row.innerHTML = `
@@ -774,13 +752,12 @@
                 <td class="text-right">Rs. ${fyTax.toLocaleString()}</td>
                 <td class="text-right">Rs. ${fyTaxFine.toLocaleString()}${fineBadge}</td>
                 <td class="text-right">${renewalLabel}</td>
-                <td class="text-right">Rs. ${currentYearIncomeTax.toLocaleString()}${incomeTaxDetails}</td>
                 <td class="text-right"><strong>Rs. ${rowTotal.toLocaleString()}</strong></td>
             `;
             tbody.appendChild(row);
         }
 
-        const grandTotal = totalTax + totalFine + totalRenewal + totalIncomeTax;
+        const grandTotal = totalTax + totalFine + totalRenewal;
         document.getElementById('grandTotalText').innerText = `Rs. ${grandTotal.toLocaleString()}/-`;
         document.getElementById('resultBox').style.display = 'block';
         document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth' });
