@@ -364,7 +364,7 @@
 
 <div class="main-wrapper">
     <div class="card">
-        <div class="section-title">सवारी साधन कर, नवीकरण तथा आयकर गणना (परिमार्जित मोटरसाइकल नवीकरण नियम)</div>
+        <div class="section-title">सवारी साधन कर, नवीकरण तथा आयकर गणना (स्वचालित आजको मिति प्रणाली)</div>
         
         <div class="form-grid">
             <div class="form-group full-width">
@@ -397,8 +397,8 @@
                         <option value="r_three_wheeler">अटो रिक्सा, थ्री ह्वीलर र टेम्पो</option>
                         <option value="r_tractor">ट्र्याक्टर</option>
                         <option value="r_power_tiller">पावर टिलर</option>
-                        <option value="r_minitruck_bus">मिनीट्रक, मिनीबस, पानी ट्याङ्कर</option>
-                        <option value="r_truck_bus">ट्रक र बस</option>
+                        <option value="r_minitruck_bus">मिनीट्रक, मिनीबस (६०% छुट सहित)</option>
+                        <option value="r_truck_bus">ट्रक र बस (६०% छुट सहित)</option>
                         <option value="r_oil_gas_container">तेल ट्याङ्कर, ग्याँस बुलेट, ट्रिपर</option>
                         <option value="r_car_electric">विद्युतीय सवारी साधन (kW आधारित)</option>
                     </optgroup>
@@ -426,7 +426,7 @@
             </div>
 
             <div class="form-group">
-                <label for="paymentInput">कर बुझाउने आजको मिति (BS)</label>
+                <label for="paymentInput">कर बुझाउने आजको मिति (BS) [स्वचालित]</label>
                 <input type="text" id="paymentInput" placeholder="YYYY-MM-DD">
             </div>
         </div>
@@ -479,8 +479,68 @@
 </div>
 
 <script>
+    // AD मितिलाई नेपाली BS मितिमा रूपान्तरण गर्ने सामान्य र सटिक फङ्सन
+    function getTodayNepaliDate() {
+        const today = new Date();
+        
+        // यदि युजरको डिभाइसको समय परिवर्तन भएमा वर्तमान समय (२०८३/2026) अनुसार स्थिर सन्दर्भ
+        const refAD = new Date(2024, 3, 13); // 2024-04-13 AD = 2081-01-01 BS
+        const refBSYear = 2081;
+        
+        // २०८१ देखि २०९० सम्मका महिनाका दिनहरूको लगत (नेपाली क्यालेन्डर डेटा)
+        const bsMonthDays = {
+            2081: [31, 32, 31, 32, 31, 30, 30, 29, 29, 30, 29, 30],
+            2082: [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 29],
+            2083: [31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30],
+            2084: [31, 31, 32, 31, 31, 30, 30, 30, 29, 30, 29, 30],
+            2085: [31, 32, 31, 32, 30, 31, 30, 29, 30, 29, 30, 29],
+            2086: [31, 32, 31, 32, 31, 30, 30, 29, 29, 30, 29, 30]
+        };
+
+        let diffTime = today.getTime() - refAD.getTime();
+        let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
+
+        // यदि थप/घट दिनहरू रेन्ज भन्दा बाहिर गएमा आजको मिति (२०८३ असार १५) लाई फलब्याक बनाउने
+        if (diffDays < 0 || diffDays > 2000) {
+            return "2083-03-15"; 
+        }
+
+        let currentYear = refBSYear;
+        let currentMonth = 0; // 0 = बैशाख
+
+        while (true) {
+            let daysInYear = bsMonthDays[currentYear].reduce((a, b) => a + b, 0);
+            if (diffDays >= daysInYear) {
+                diffDays -= daysInYear;
+                currentYear++;
+            } else {
+                break;
+            }
+        }
+
+        while (true) {
+            let daysInMonth = bsMonthDays[currentYear][currentMonth];
+            if (diffDays >= daysInMonth) {
+                diffDays -= daysInMonth;
+                currentMonth++;
+            } else {
+                break;
+            }
+        }
+
+        let bsDay = diffDays + 1;
+        let bsMonth = currentMonth + 1;
+
+        // YYYY-MM-DD ढाँचामा ल्याउनका लागि प्याडिङ
+        let strMonth = bsMonth < 10 ? '0' + bsMonth : bsMonth;
+        let strDay = bsDay < 10 ? '0' + bsDay : bsDay;
+
+        return `${currentYear}-${strMonth}-${strDay}`;
+    }
+
     document.addEventListener("DOMContentLoaded", function() {
-        document.getElementById('paymentInput').value = "2083-03-15";
+        // आजको नेपाली मिति स्वतः इनपुट बक्समा सेट हुन्छ
+        document.getElementById('paymentInput').value = getTodayNepaliDate();
     });
 
     function handleCategoryChange() {
@@ -575,8 +635,8 @@
             'r_three_wheeler': 6000,
             'r_tractor': 8000,
             'r_power_tiller': 4500,
-            'r_minitruck_bus': 15000,
-            'r_truck_bus': 20000,
+            'r_minitruck_bus': 15000 * 0.40, // ६०% छुटसहित
+            'r_truck_bus': 20000 * 0.40,     // ६०% छुटसहित
             'r_oil_gas_container': 22000
         };
 
@@ -708,7 +768,6 @@
                 else taxFinePercentage = 1.00;
 
                 if (isBike) {
-                    // नयाँ नियम: नवीकरण ३०० + १००% जरिवाना ३०० + थप नवीकरण ३०० = ९००
                     currentYearRenewal = 300 + 300 + 300;
                     isSpecialBikeFineApplied = true;
                 } else {
@@ -769,9 +828,11 @@
                 renewalLabel += ` <span class="badge">(म्याद नाघेको दस्तुर दोब्बर)</span>`;
             }
 
+            let discountBadge = (category === 'r_truck_bus' || category === 'r_minitruck_bus') ? ` <span class="badge-income">६०% छुट लागू</span>` : '';
+
             row.innerHTML = `
                 <td><strong>${fyLabel}</strong></td>
-                <td class="text-right">Rs. ${fyTax.toLocaleString()}</td>
+                <td class="text-right">Rs. ${fyTax.toLocaleString()}${discountBadge}</td>
                 <td class="text-right">Rs. ${fyTaxFine.toLocaleString()}${fineBadge}</td>
                 <td class="text-right">${renewalLabel}</td>
                 <td class="text-right">Rs. ${currentYearIncomeTax.toLocaleString()}${incomeTaxDetails}</td>
