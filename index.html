@@ -242,6 +242,14 @@
             border-bottom: 1px solid var(--border);
         }
 
+        tfoot td {
+            padding: 16px;
+            background-color: #f1f5f9;
+            font-weight: 700;
+            color: var(--text-title);
+            border-top: 2px solid var(--border);
+        }
+
         .text-right {
             text-align: right;
         }
@@ -333,7 +341,7 @@
                 color: #000 !important;
                 border: 1px solid #cbd5e1;
             }
-            th {
+            th, tfoot td {
                 background-color: #f1f5f9 !important;
                 color: #000 !important;
                 border-bottom: 2px solid #000 !important;
@@ -364,7 +372,7 @@
 
 <div class="main-wrapper">
     <div class="card">
-        <div class="section-title">सवारी साधन कर, नवीकरण तथा आयकर गणना (स्वचालित आजको मिति प्रणाली)</div>
+        <div class="section-title">सवारी साधन कर, नवीकरण तथा आयकर गणना प्रणाली</div>
         
         <div class="form-grid">
             <div class="form-group full-width">
@@ -458,6 +466,16 @@
                     </tr>
                 </thead>
                 <tbody id="tableBody"></tbody>
+                <tfoot id="tableFooter">
+                    <tr>
+                        <td>कुल जम्मा (Total):</td>
+                        <td class="text-right" id="totalTaxCell">Rs. 0</td>
+                        <td class="text-right" id="totalFineCell">Rs. 0</td>
+                        <td class="text-right" id="totalRenewalCell">Rs. 0</td>
+                        <td class="text-right" id="totalIncomeTaxCell">Rs. 0</td>
+                        <td class="text-right" id="totalRowGrandCell" style="color: #15803d; font-size: 15px;">Rs. 0</td>
+                    </tr>
+                </tfoot>
             </table>
         </div>
         
@@ -479,15 +497,13 @@
 </div>
 
 <script>
-    // AD मितिलाई नेपाली BS मितिमा रूपान्तरण गर्ने सामान्य र सटिक फङ्सन
+    // AD मितिलाई नेपाली BS मितिमा रूपान्तरण गर्ने फङ्सन
     function getTodayNepaliDate() {
         const today = new Date();
         
-        // यदि युजरको डिभाइसको समय परिवर्तन भएमा वर्तमान समय (२०८३/2026) अनुसार स्थिर सन्दर्भ
         const refAD = new Date(2024, 3, 13); // 2024-04-13 AD = 2081-01-01 BS
         const refBSYear = 2081;
         
-        // २०८१ देखि २०९० सम्मका महिनाका दिनहरूको लगत (नेपाली क्यालेन्डर डेटा)
         const bsMonthDays = {
             2081: [31, 32, 31, 32, 31, 30, 30, 29, 29, 30, 29, 30],
             2082: [31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 29],
@@ -500,13 +516,12 @@
         let diffTime = today.getTime() - refAD.getTime();
         let diffDays = Math.floor(diffTime / (1000 * 60 * 60 * 24));
 
-        // यदि थप/घट दिनहरू रेन्ज भन्दा बाहिर गएमा आजको मिति (२०८३ असार १५) लाई फलब्याक बनाउने
         if (diffDays < 0 || diffDays > 2000) {
-            return "2083-03-15"; 
+            return "2083-04-05"; 
         }
 
         let currentYear = refBSYear;
-        let currentMonth = 0; // 0 = बैशाख
+        let currentMonth = 0; 
 
         while (true) {
             let daysInYear = bsMonthDays[currentYear].reduce((a, b) => a + b, 0);
@@ -531,7 +546,6 @@
         let bsDay = diffDays + 1;
         let bsMonth = currentMonth + 1;
 
-        // YYYY-MM-DD ढाँचामा ल्याउनका लागि प्याडिङ
         let strMonth = bsMonth < 10 ? '0' + bsMonth : bsMonth;
         let strDay = bsDay < 10 ? '0' + bsDay : bsDay;
 
@@ -539,7 +553,6 @@
     }
 
     document.addEventListener("DOMContentLoaded", function() {
-        // आजको नेपाली मिति स्वतः इनपुट बक्समा सेट हुन्छ
         document.getElementById('paymentInput').value = getTodayNepaliDate();
     });
 
@@ -635,8 +648,8 @@
             'r_three_wheeler': 6000,
             'r_tractor': 8000,
             'r_power_tiller': 4500,
-            'r_minitruck_bus': 15000 * 0.40, // ६०% छुटसहित
-            'r_truck_bus': 20000 * 0.40,     // ६०% छुटसहित
+            'r_minitruck_bus': 15000 * 0.40,
+            'r_truck_bus': 20000 * 0.40,
             'r_oil_gas_container': 22000
         };
 
@@ -733,10 +746,19 @@
         const initialExpiredFY = getFYStartYear(expYear, expMonth);
         const currentPaymentFY = getFYStartYear(payYear, payMonth);
 
+        const tbody = document.getElementById('tableBody');
+        tbody.innerHTML = ''; 
+
         if (initialExpiredFY === currentPaymentFY && (expYear > payYear || (expYear === payYear && expMonth > payMonth) || (expYear === payYear && expMonth === payMonth && expDay >= payDay))) {
-            const tbody = document.getElementById('tableBody');
             tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: #16a34a; font-weight: 600; padding: 20px;">यस आर्थिक वर्षको कर पहिले नै चुक्ता भइसकेको छ। थप शुल्क लाग्ने छैन।</td></tr>';
+            
+            document.getElementById('totalTaxCell').innerText = 'Rs. 0';
+            document.getElementById('totalFineCell').innerText = 'Rs. 0';
+            document.getElementById('totalRenewalCell').innerText = 'Rs. 0';
+            document.getElementById('totalIncomeTaxCell').innerText = 'Rs. 0';
+            document.getElementById('totalRowGrandCell').innerText = 'Rs. 0';
             document.getElementById('grandTotalText').innerText = `Rs. 0/-`;
+            
             document.getElementById('resultBox').style.display = 'block';
             return;
         }
@@ -747,9 +769,6 @@
         let totalFine = 0;
         let totalRenewal = 0;
         let totalIncomeTax = 0;
-        
-        const tbody = document.getElementById('tableBody');
-        tbody.innerHTML = ''; 
 
         const isBike = (category === 'p_bike_fuel' || category === 'p_bike_electric');
 
@@ -842,6 +861,15 @@
         }
 
         const grandTotal = totalTax + totalFine + totalRenewal + totalIncomeTax;
+
+        // टेबलको पुछारमा कुल जम्मा रकमहरू राख्ने
+        document.getElementById('totalTaxCell').innerText = `Rs. ${totalTax.toLocaleString()}`;
+        document.getElementById('totalFineCell').innerText = `Rs. ${totalFine.toLocaleString()}`;
+        document.getElementById('totalRenewalCell').innerText = `Rs. ${totalRenewal.toLocaleString()}`;
+        document.getElementById('totalIncomeTaxCell').innerText = `Rs. ${totalIncomeTax.toLocaleString()}`;
+        document.getElementById('totalRowGrandCell').innerText = `Rs. ${grandTotal.toLocaleString()}`;
+
+        // मुख्य ठूलो बाकसमा कुल जम्मा रकम देखाउने
         document.getElementById('grandTotalText').innerText = `Rs. ${grandTotal.toLocaleString()}/-`;
         document.getElementById('resultBox').style.display = 'block';
         document.getElementById('resultBox').scrollIntoView({ behavior: 'smooth' });
